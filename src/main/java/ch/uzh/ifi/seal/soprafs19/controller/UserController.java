@@ -25,7 +25,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     User getUser(@PathVariable long id){
         User User = service.getUser(id);
-        if(User == null) throw new UserNotFoundException(id);
+        if(User == null) throw new UserNotFoundException("Following Id not found: "+id);
         return User;
     }
 

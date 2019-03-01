@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,9 @@ public class UserService {
     public User getUser(long id){ return this.userRepository.findById(id);}
 
     public User createUser(User newUser) {
+        if(userRepository.findByUsername(newUser.getUsername()) != null){
+            throw new UsernameAlreadyTakenException("username "+newUser.getUsername()+" already used");
+        }
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
         userRepository.save(newUser);
