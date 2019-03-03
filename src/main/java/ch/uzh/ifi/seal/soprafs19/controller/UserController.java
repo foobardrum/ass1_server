@@ -18,8 +18,8 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users")
-    Iterable<User> all() {
-        return service.getUsers();
+    Iterable<User> all(@RequestParam(value = "search") String search) {
+        return service.getUsers(search);
     }
 
     @GetMapping("/users/{id}")
