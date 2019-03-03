@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import org.slf4j.Logger;
@@ -41,5 +42,15 @@ public class UserService {
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
+    }
+
+    public void updateUser(long id, User updatedUser){
+        User existingUser = userRepository.findById(id);
+        if(existingUser == null) throw new UserNotFoundException("Following Id not found: "+id);
+        if(updatedUser.getName() != null ) existingUser.setName(updatedUser.getName());
+        if(updatedUser.getUsername() != null )existingUser.setUsername(updatedUser.getUsername());
+        if(updatedUser.getPassword() != null )existingUser.setPassword(updatedUser.getPassword());
+        if(updatedUser.getStatus() != null )existingUser.setStatus(updatedUser.getStatus());
+        if(updatedUser.getToken() != null )existingUser.setToken(updatedUser.getToken());
     }
 }
