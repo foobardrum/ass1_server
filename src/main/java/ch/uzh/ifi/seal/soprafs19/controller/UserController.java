@@ -18,7 +18,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users")
-    Iterable<User> all(@RequestParam(value = "search") String search) {
+    Iterable<User> all(@RequestParam(value = "search", required = false, defaultValue = "") String search) {
         return service.getUsers(search);
     }
 

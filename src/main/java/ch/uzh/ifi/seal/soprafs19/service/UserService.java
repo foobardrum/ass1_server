@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.QueryInvalidException;
 import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -32,8 +33,15 @@ public class UserService {
     }
 
     public Iterable<User> getUsers(String search) {
-        Node rootNode = new RSQLParser().parse(search);
-        Specification<User> spec = rootNode.accept(new CustomRsqlVisitor<User>());
+        if(!search.equals("")){
+            try {
+                Node rootNode = new RSQLParser().parse(search);
+                Specification<User> spec = rootNode.accept(new CustomRsqlVisitor<User>());
+                return this.userRepository.findAll(spec);
+            }catch (Exception e){
+                throw new QueryInvalidException(e.getMessage());
+            }
+        }
         return this.userRepository.findAll();
     }
 
