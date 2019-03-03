@@ -12,6 +12,6 @@ public class QueryInvalidException extends RuntimeException {
 
     public QueryInvalidException(String ErrorMessage) {
         super(ErrorMessage);
-        log.info(ErrorMessage);
+        log.debug(ErrorMessage);
     }
 }
