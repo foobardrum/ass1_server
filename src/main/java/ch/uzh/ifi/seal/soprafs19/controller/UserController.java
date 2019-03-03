@@ -16,21 +16,27 @@ public class UserController {
         this.service = service;
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users")
     Iterable<User> all() {
         return service.getUsers();
     }
 
     @GetMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     User getUser(@PathVariable long id){
         User User = service.getUser(id);
         if(User == null) throw new UserNotFoundException("Following Id not found: "+id);
         return User;
     }
 
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/users")
     User createUser(@RequestBody User newUser) {
         return this.service.createUser(newUser);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping("/users/{id}")
+    void updateUser(@PathVariable long id, @RequestBody User updatedUser){ this.service.updateUser(id, updatedUser);}
 }
