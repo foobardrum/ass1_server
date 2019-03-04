@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserService service;
@@ -38,5 +39,6 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/users/{id}")
+    @CrossOrigin(origins = "http://localhost:3000")
     void updateUser(@PathVariable long id, @RequestBody User updatedUser){ this.service.updateUser(id, updatedUser);}
 }
