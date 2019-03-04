@@ -66,12 +66,13 @@ public class UserService {
         if(updatedUser.getUsername() != null )existingUser.setUsername(updatedUser.getUsername());
         if(updatedUser.getPassword() != null )existingUser.setPassword(updatedUser.getPassword());
         if(updatedUser.getStatus() != null )existingUser.setStatus(updatedUser.getStatus());
+        if(updatedUser.getBirthdayDate() != null )existingUser.setBirthdayDate(updatedUser.getBirthdayDate());
     }
 
     public User authenticateUser(User userToAuthenticate){
-        User userByUsername = userRepository.findByUsername(userToAuthenticate.getUsername());
-        if(userByUsername != null && userByUsername.getPassword().equals(userToAuthenticate.getPassword())){
-            return userByUsername;
+        User user = userRepository.findByUsername(userToAuthenticate.getUsername());
+        if(user != null && user.getPassword().equals(userToAuthenticate.getPassword())){
+            return user;
         }else{
             throw new AuthFailedException("Invalid Authentication Data Provided");
         }

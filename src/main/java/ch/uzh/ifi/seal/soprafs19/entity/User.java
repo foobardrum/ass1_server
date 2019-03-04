@@ -37,6 +37,10 @@ public class User implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private java.util.Date registrationDateTime = new Date();
 
+	@Column
+	@Temporal(TemporalType.DATE)
+	private java.util.Date birthdayDate;
+
 	public Long getId() {
 		return id;
 	}
@@ -87,6 +91,14 @@ public class User implements Serializable {
 
 	public void setRegistrationDateTime(Date registrationDateTime) {
 		this.registrationDateTime = registrationDateTime;
+	}
+
+	public Date getBirthdayDate() {
+		return birthdayDate;
+	}
+
+	public void setBirthdayDate(Date birthdayDate) {
+		this.birthdayDate = birthdayDate;
 	}
 
 	@Override
