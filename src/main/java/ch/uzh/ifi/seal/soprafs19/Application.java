@@ -49,7 +49,7 @@ public class Application {
         return (args) -> {
             UserService service = new UserService(repository);
             // save a couple of Users
-            String[] testUsers = {"testUser1","testUser2","tobi"};
+            String[] testUsers = {"hans","nöbi","tobi"};
             for (String username:testUsers) {
                 User user = new User();
                 user.setUsername(username);
