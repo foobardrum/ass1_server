@@ -16,6 +16,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -54,6 +56,7 @@ public class Application {
                 User user = new User();
                 user.setUsername(username);
                 user.setPassword("asdfasdf");
+                user.setBirthdayDate(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
                 service.createUser(user);
             }
 
