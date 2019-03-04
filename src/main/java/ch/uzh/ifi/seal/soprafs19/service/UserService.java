@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.AuthFailedException;
 import ch.uzh.ifi.seal.soprafs19.exception.QueryInvalidException;
 import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
@@ -65,5 +66,14 @@ public class UserService {
         if(updatedUser.getUsername() != null )existingUser.setUsername(updatedUser.getUsername());
         if(updatedUser.getPassword() != null )existingUser.setPassword(updatedUser.getPassword());
         if(updatedUser.getStatus() != null )existingUser.setStatus(updatedUser.getStatus());
+    }
+
+    public User authenticateUser(User userToAuthenticate){
+        User userByUsername = userRepository.findByUsername(userToAuthenticate.getUsername());
+        if(userByUsername != null && userByUsername.getPassword().equals(userToAuthenticate.getPassword())){
+            return userByUsername;
+        }else{
+            throw new AuthFailedException("Invalid Authentication Data Provided");
+        }
     }
 }

@@ -22,6 +22,11 @@ public class UserController {
         return service.getUsers(search);
     }
 
+
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PostMapping("/me")
+    User authenticateUser(@RequestBody User user){ return this.service.authenticateUser(user);}
+
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     User getUser(@PathVariable long id){
