@@ -3,11 +3,10 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class User implements Serializable {
@@ -33,6 +32,10 @@ public class User implements Serializable {
 
 	@Column(nullable = false)
 	private UserStatus status;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private java.util.Date registrationDateTime = new Date();
 
 	public Long getId() {
 		return id;
@@ -76,6 +79,14 @@ public class User implements Serializable {
 
 	public void setStatus(UserStatus status) {
 		this.status = status;
+	}
+
+	public Date getRegistrationDateTime() {
+		return registrationDateTime;
+	}
+
+	public void setRegistrationDateTime(Date registrationDateTime) {
+		this.registrationDateTime = registrationDateTime;
 	}
 
 	@Override
