@@ -65,6 +65,5 @@ public class UserService {
         if(updatedUser.getUsername() != null )existingUser.setUsername(updatedUser.getUsername());
         if(updatedUser.getPassword() != null )existingUser.setPassword(updatedUser.getPassword());
         if(updatedUser.getStatus() != null )existingUser.setStatus(updatedUser.getStatus());
-        if(updatedUser.getToken() != null )existingUser.setToken(updatedUser.getToken());
     }
 }
