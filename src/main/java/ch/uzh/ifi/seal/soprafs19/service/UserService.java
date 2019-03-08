@@ -53,7 +53,7 @@ public class UserService {
             throw new UsernameAlreadyTakenException("username "+newUser.getUsername()+" already used");
         }
         newUser.setToken(UUID.randomUUID().toString());
-        newUser.setStatus(UserStatus.ONLINE);
+        newUser.setStatus(UserStatus.OFFLINE);
         userRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
@@ -62,16 +62,19 @@ public class UserService {
     public void updateUser(long id, User updatedUser){
         User existingUser = userRepository.findById(id);
         if(existingUser == null) throw new UserNotFoundException("Following Id not found: "+id);
-        if(updatedUser.getName() != null ) existingUser.setName(updatedUser.getName());
-        if(updatedUser.getUsername() != null )existingUser.setUsername(updatedUser.getUsername());
-        if(updatedUser.getPassword() != null )existingUser.setPassword(updatedUser.getPassword());
-        if(updatedUser.getStatus() != null )existingUser.setStatus(updatedUser.getStatus());
-        if(updatedUser.getBirthdayDate() != null )existingUser.setBirthdayDate(updatedUser.getBirthdayDate());
+        if (updatedUser.getName() != null) existingUser.setName(updatedUser.getName());
+        if (updatedUser.getUsername() != null) existingUser.setUsername(updatedUser.getUsername());
+        if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());
+        if (updatedUser.getStatus() != null) existingUser.setStatus(updatedUser.getStatus());
+        if (updatedUser.getBirthdayDate() != null) existingUser.setBirthdayDate(updatedUser.getBirthdayDate());
+        userRepository.save(existingUser);
     }
 
     public User authenticateUser(User userToAuthenticate){
         User user = userRepository.findByUsername(userToAuthenticate.getUsername());
         if(user != null && user.getPassword().equals(userToAuthenticate.getPassword())){
+            user.setStatus(UserStatus.ONLINE);
+            userRepository.save(user);
             return user;
         }else{
             throw new AuthFailedException("Invalid Authentication Data Provided");
