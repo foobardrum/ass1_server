@@ -45,17 +45,14 @@ public class UserService {
     }
 
     public User getUser(long id){
-        User User = this.userRepository.findById(id);
-        if(User == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
-        }
-        return User;
+        return this.userRepository.findById(id);
+    }
+
+    public User getUserByUsername(String username){
+        return this.userRepository.findByUsername(username);
     }
 
     public User createUser(User newUser) {
-        if(userRepository.findByUsername(newUser.getUsername()) != null){
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"username "+newUser.getUsername()+" already taken.");
-        }
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.OFFLINE);
         userRepository.save(newUser);
@@ -63,19 +60,22 @@ public class UserService {
         return newUser;
     }
 
-    public void updateUser(long id, String token, User updatedUser){
+    public User updateUser(long id, User updatedUser){
         User existingUser = userRepository.findById(id);
         if(existingUser == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
-        }
-        if(!existingUser.getToken().equals(token)){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"You're not unauthorized to update this user!");
+           return null;
         }
         if (updatedUser.getUsername() != null) existingUser.setUsername(updatedUser.getUsername());
         if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());
         if (updatedUser.getStatus() != null) existingUser.setStatus(updatedUser.getStatus());
         if (updatedUser.getBirthdayDate() != null) existingUser.setBirthdayDate(updatedUser.getBirthdayDate());
         userRepository.save(existingUser);
+        return existingUser;
+    }
+
+    public void deleteUser(long id){
+        User user = userRepository.findById(id);
+        userRepository.delete(user);
     }
 
     public User authenticateUser(User userToAuthenticate){
@@ -85,14 +85,11 @@ public class UserService {
             userRepository.save(user);
             return user;
         }else{
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"Invalid authentication data provided!");
+            return null;
         }
     }
 
     public Boolean isAuthorized(String token){
-        if(!userRepository.existsByToken(token)){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
-        }
-        return true;
+        return userRepository.existsByToken(token);
     }
 }

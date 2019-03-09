@@ -4,6 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class UserController {
@@ -22,27 +23,42 @@ public class UserController {
     ) {
         if(service.isAuthorized(token)) {
             return service.getUsers(search);
+        }else{
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
         }
-        return null;
     }
 
 
     @ResponseStatus(HttpStatus.ACCEPTED)
     @PostMapping("/me")
-    User authenticateUser(@RequestBody User user){ return this.service.authenticateUser(user);}
+    User authenticateUser(@RequestBody User user){
+        User authenticatedUser  = this.service.authenticateUser(user);
+        if(authenticatedUser == null){
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"Invalid authentication data provided!");
+        }
+        return authenticatedUser;
+    }
 
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     User getUser(@PathVariable long id, @RequestHeader(value = "Authorization",defaultValue = "") String token){
         if(service.isAuthorized(token)) {
-            return service.getUser(id);
+            User user = service.getUser(id);
+            if(user == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+            }
+            return user;
+        }else{
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
         }
-        return null;
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
     User createUser(@RequestBody User newUser) {
+        if(this.service.getUserByUsername(newUser.getUsername()) != null){
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"username "+newUser.getUsername()+" already taken.");
+        }
         return this.service.createUser(newUser);
     }
 
@@ -53,8 +69,13 @@ public class UserController {
             @RequestBody User updatedUser,
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ){
-        if(service.isAuthorized(token)){
-            this.service.updateUser(id, token, updatedUser);
+        User existingUser = this.service.getUser(id);
+        if(service.isAuthorized(token) || !existingUser.getToken().equals(token)){
+            if(this.service.updateUser(id, updatedUser) == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+            }
+        }else{
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
         }
     }
 }
