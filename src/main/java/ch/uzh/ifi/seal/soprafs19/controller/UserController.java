@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.AuthFailedException;
 import ch.uzh.ifi.seal.soprafs19.exception.NotAuthorizedException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class UserController {
     User authenticateUser(@RequestBody User user){
         User authenticatedUser  = this.service.authenticateUser(user);
         if(authenticatedUser == null){
-            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"Invalid authentication data provided!");
+            throw new AuthFailedException();
         }
         return authenticatedUser;
     }
