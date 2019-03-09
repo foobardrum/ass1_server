@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.QueryInvalidException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.rsql.CustomRsqlVisitor;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -39,7 +40,7 @@ public class UserService {
                 Specification<User> spec = rootNode.accept(new CustomRsqlVisitor<User>());
                 return this.userRepository.findAll(spec);
             }catch (Exception e){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Query Invalid: "+e.getMessage());
+                throw new QueryInvalidException(e.getMessage());
             }
         }
         return this.userRepository.findAll();

@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.QueryInvalidException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.junit.Assert;
@@ -94,7 +95,7 @@ public class UserServiceTest {
         userService.deleteUser(createdUser2.getId());
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test(expected = QueryInvalidException.class)
     public void getUsersWithSearchInvalid(){
         List<User> foundUsers = userService.getUsers("username=;");
     }
