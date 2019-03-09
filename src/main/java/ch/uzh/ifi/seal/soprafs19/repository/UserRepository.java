@@ -11,5 +11,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 	User findByUsername(String username);
 	User findByToken(String token);
 	User findById(long id);
+	Boolean existsByToken(String token);
 	Iterable<User> findAll(Specification specification);
 }
