@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exception.AuthFailedException;
 import ch.uzh.ifi.seal.soprafs19.exception.NotAuthorizedException;
+import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class UserController {
         if(service.isAuthorized(token)) {
             User user = service.getUser(id);
             if(user == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+                throw new UserNotFoundException(id);
             }
             return user;
         }else{
@@ -76,7 +77,7 @@ public class UserController {
         User existingUser = this.service.getUser(id);
         if(service.isAuthorized(token) || !existingUser.getToken().equals(token)){
             if(this.service.updateUser(id, updatedUser) == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+                throw new UserNotFoundException(id);
             }
         }else{
             throw new NotAuthorizedException();
