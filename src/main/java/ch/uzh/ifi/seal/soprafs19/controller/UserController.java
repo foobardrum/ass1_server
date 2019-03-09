@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.exception.NotAuthorizedException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class UserController {
         if(service.isAuthorized(token)) {
             return service.getUsers(search);
         }else{
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
+            throw new NotAuthorizedException();
         }
     }
 
@@ -51,7 +52,7 @@ public class UserController {
             }
             return user;
         }else{
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
+            throw new NotAuthorizedException();
         }
     }
 
@@ -77,7 +78,7 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
             }
         }else{
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
+            throw new NotAuthorizedException();
         }
     }
 }

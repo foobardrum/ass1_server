@@ -4,14 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-@ResponseStatus(value= HttpStatus.UNAUTHORIZED, reason="Provided Token is unauthorized!")
-public class NotAuthorizedException extends RuntimeException {
-
-    private final Logger log = LoggerFactory.getLogger(Exception.class);
-
-    public NotAuthorizedException(String ErrorMessage) {
-        super(ErrorMessage);
-        log.debug(ErrorMessage);
+public class NotAuthorizedException extends ResponseStatusException {
+    public NotAuthorizedException() {
+        super(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
     }
 }
