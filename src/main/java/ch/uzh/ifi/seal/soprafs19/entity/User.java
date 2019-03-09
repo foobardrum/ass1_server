@@ -113,6 +113,6 @@ public class User implements Serializable {
 
 	@Override
 	public String toString(){
-		return this.getId()+": "+this.getUsername()+", "+this.getStatus();
+		return this.getId()+": "+this.getUsername()+", "+this.getStatus()+", "+this.getToken();
 	}
 }
