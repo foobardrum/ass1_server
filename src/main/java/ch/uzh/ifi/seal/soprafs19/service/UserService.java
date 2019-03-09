@@ -63,10 +63,13 @@ public class UserService {
         return newUser;
     }
 
-    public void updateUser(long id, User updatedUser){
+    public void updateUser(long id, String token, User updatedUser){
         User existingUser = userRepository.findById(id);
         if(existingUser == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+        }
+        if(!existingUser.getToken().equals(token)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"You're not unauthorized to update this user!");
         }
         if (updatedUser.getUsername() != null) existingUser.setUsername(updatedUser.getUsername());
         if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());

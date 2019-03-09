@@ -50,6 +50,6 @@ public class UserController {
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ){
         service.isAuthorized(token);
-        this.service.updateUser(id, updatedUser);
+        this.service.updateUser(id, token, updatedUser);
     }
 }
