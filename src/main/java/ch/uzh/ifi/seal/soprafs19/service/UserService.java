@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -31,7 +32,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Iterable<User> getUsers(String search) {
+    public List<User> getUsers(String search) {
         if(!search.equals("")){
             try {
                 Node rootNode = new RSQLParser().parse(search);

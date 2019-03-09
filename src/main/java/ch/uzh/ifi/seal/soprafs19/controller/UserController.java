@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 public class UserController {
 
@@ -17,7 +19,7 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users")
-    Iterable<User> all(
+    List<User> all(
             @RequestParam(value = "search", required = false, defaultValue = "") String search,
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ) {
