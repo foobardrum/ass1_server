@@ -2,10 +2,6 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.exception.AuthFailedException;
-import ch.uzh.ifi.seal.soprafs19.exception.QueryInvalidException;
-import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
-import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.rsql.CustomRsqlVisitor;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -42,7 +38,7 @@ public class UserService {
                 Specification<User> spec = rootNode.accept(new CustomRsqlVisitor<User>());
                 return this.userRepository.findAll(spec);
             }catch (Exception e){
-                throw new QueryInvalidException(e.getMessage());
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Query Invalid: "+e.getMessage());
             }
         }
         return this.userRepository.findAll();
@@ -50,13 +46,15 @@ public class UserService {
 
     public User getUser(long id){
         User User = this.userRepository.findById(id);
-        if(User == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+        if(User == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+        }
         return User;
     }
 
     public User createUser(User newUser) {
         if(userRepository.findByUsername(newUser.getUsername()) != null){
-            throw new UsernameAlreadyTakenException("username "+newUser.getUsername()+" already used");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,"username "+newUser.getUsername()+" already taken.");
         }
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.OFFLINE);
@@ -67,8 +65,9 @@ public class UserService {
 
     public void updateUser(long id, User updatedUser){
         User existingUser = userRepository.findById(id);
-        if(existingUser == null) throw new UserNotFoundException("Following Id not found: "+id);
-        if (updatedUser.getName() != null) existingUser.setName(updatedUser.getName());
+        if(existingUser == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+        }
         if (updatedUser.getUsername() != null) existingUser.setUsername(updatedUser.getUsername());
         if (updatedUser.getPassword() != null) existingUser.setPassword(updatedUser.getPassword());
         if (updatedUser.getStatus() != null) existingUser.setStatus(updatedUser.getStatus());
@@ -83,13 +82,13 @@ public class UserService {
             userRepository.save(user);
             return user;
         }else{
-            throw new AuthFailedException("Invalid Authentication Data Provided");
+            throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE,"Invalid authentication data provided!");
         }
     }
 
     public void isAuthorized(String token){
         if(!userRepository.existsByToken(token)){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided Token is unauthorized!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
         }
     }
 }
