@@ -20,8 +20,10 @@ public class UserController {
             @RequestParam(value = "search", required = false, defaultValue = "") String search,
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ) {
-        service.isAuthorized(token);
-        return service.getUsers(search);
+        if(service.isAuthorized(token)) {
+            return service.getUsers(search);
+        }
+        return null;
     }
 
 
@@ -32,8 +34,10 @@ public class UserController {
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     User getUser(@PathVariable long id, @RequestHeader(value = "Authorization",defaultValue = "") String token){
-        service.isAuthorized(token);
-        return service.getUser(id);
+        if(service.isAuthorized(token)) {
+            return service.getUser(id);
+        }
+        return null;
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,7 +53,8 @@ public class UserController {
             @RequestBody User updatedUser,
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ){
-        service.isAuthorized(token);
-        this.service.updateUser(id, token, updatedUser);
+        if(service.isAuthorized(token)){
+            this.service.updateUser(id, token, updatedUser);
+        }
     }
 }

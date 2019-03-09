@@ -89,9 +89,10 @@ public class UserService {
         }
     }
 
-    public void isAuthorized(String token){
+    public Boolean isAuthorized(String token){
         if(!userRepository.existsByToken(token)){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided token is unauthorized!");
         }
+        return true;
     }
 }
