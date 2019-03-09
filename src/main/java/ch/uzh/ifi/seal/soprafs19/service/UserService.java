@@ -14,8 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -46,7 +48,11 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User getUser(long id){ return this.userRepository.findById(id);}
+    public User getUser(long id){
+        User User = this.userRepository.findById(id);
+        if(User == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User with following Id not found: "+id);
+        return User;
+    }
 
     public User createUser(User newUser) {
         if(userRepository.findByUsername(newUser.getUsername()) != null){
@@ -78,6 +84,12 @@ public class UserService {
             return user;
         }else{
             throw new AuthFailedException("Invalid Authentication Data Provided");
+        }
+    }
+
+    public void isAuthorized(String token){
+        if(!userRepository.existsByToken(token)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Provided Token is unauthorized!");
         }
     }
 }
