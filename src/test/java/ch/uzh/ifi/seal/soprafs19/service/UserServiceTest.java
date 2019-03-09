@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Test class for the UserResource REST resource.
@@ -36,57 +38,90 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
+    private User testUser;
+    private User testUser2;
+
+    @Before
+    public void initialize(){
+        this.testUser = new User();
+        this.testUser.setUsername("testUsername");
+        this.testUser.setPassword("testPassword");
+
+        this.testUser2 = new User();
+        this.testUser2.setUsername("testUsername2");
+        this.testUser2.setPassword("testPassword2");
+    }
+
     @Test
     public void createUser() {
-        Assert.assertNull(userRepository.findByUsername("testUsername"));
-
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-
-        User createdUser = userService.createUser(testUser);
+        Assert.assertNull(userRepository.findByUsername(this.testUser.getUsername()));
+        User createdUser = userService.createUser(this.testUser);
 
         Assert.assertNotNull(createdUser.getToken());
         Assert.assertEquals(createdUser.getStatus(),UserStatus.OFFLINE);
         Assert.assertEquals(createdUser, userRepository.findByToken(createdUser.getToken()));
         Assert.assertEquals(createdUser, userRepository.findByUsername(createdUser.getUsername()));
+
+        userService.deleteUser(createdUser.getId());
     }
 
     @Test
     public void getUsers(){
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createUser(this.testUser);
+        User createdUser2 = userService.createUser(this.testUser2);
 
-        User testUser2 = new User();
-        testUser2.setUsername("testUsername2");
-        testUser2.setPassword("testPassword2");
-        User createdUser2 = userService.createUser(testUser2);
-
-        Iterable<User> users = userRepository.findAll();
-        Iterable<User> foundUsers = userService.getUsers("");
+        List<User> users = userRepository.findAll();
+        List<User> foundUsers = userService.getUsers("");
 
         Assert.assertEquals(users,foundUsers);
+
+        userService.deleteUser(createdUser.getId());
+        userService.deleteUser(createdUser2.getId());
+    }
+
+    @Test
+    public void getUsersWithSearch(){
+        User createdUser = userService.createUser(this.testUser);
+        User createdUser2 = userService.createUser(this.testUser2);
+
+        List<User> foundUsers = userService.getUsers("username=="+createdUser2.getUsername());
+
+        Assert.assertEquals(1, foundUsers.size());
+        Assert.assertEquals(createdUser2,foundUsers.get(0));
+
+
+        userService.deleteUser(createdUser.getId());
+        userService.deleteUser(createdUser2.getId());
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void getUsersWithSearchInvalid(){
+        List<User> foundUsers = userService.getUsers("username=;");
     }
 
     @Test
     public void getUser(){
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createUser(this.testUser);
 
         Assert.assertNotNull(userService.getUser(createdUser.getId()));
         Assert.assertEquals(createdUser,userService.getUser(createdUser.getId()));
+
+        userService.deleteUser(createdUser.getId());
+    }
+
+    @Test
+    public void getUserByUsername(){
+        User createdUser = userService.createUser(this.testUser);
+
+        Assert.assertNotNull(userService.getUser(createdUser.getId()));
+        Assert.assertEquals(createdUser,userService.getUserByUsername(createdUser.getUsername()));
+
+        userService.deleteUser(createdUser.getId());
     }
 
     @Test
     public void updateUser() throws ParseException {
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createUser(this.testUser);
 
         Assert.assertEquals(UserStatus.OFFLINE, createdUser.getStatus());
         Assert.assertEquals("testUsername", createdUser.getUsername());
@@ -99,47 +134,70 @@ public class UserServiceTest {
         userUpdate.setPassword("testPassword2");
         userUpdate.setBirthdayDate(new SimpleDateFormat("yy-MM-dd").parse("1948-04-06"));
 
-        userService.updateUser(userUpdate.getId(),userUpdate.getToken(),userUpdate);
+        Assert.assertEquals(userUpdate,userService.updateUser(userUpdate.getId(),userUpdate));
 
-        Assert.assertEquals(userUpdate,userService.getUser(userUpdate.getId()));
+        userService.deleteUser(createdUser.getId());
+    }
+
+    @Test
+    public void updateUserNotExistent() {
+
+        long wrongId = 1000000;
+
+        Assert.assertNull(userService.getUser(wrongId));
+        Assert.assertNull(userService.updateUser(wrongId,this.testUser));
+    }
+
+
+    @Test
+    public void deleteUser(){
+        User createdUser = userService.createUser(this.testUser);
+
+        Assert.assertNotNull(userService.getUser(createdUser.getId()));
+
+        userService.deleteUser(createdUser.getId());
+
+        Assert.assertNull(userService.getUser(createdUser.getId()));
     }
 
     @Test
     public void authenticateUser(){
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
-
+        User createdUser = userService.createUser(this.testUser);
         User userFromDb = userService.getUser(createdUser.getId());
 
-        Assert.assertEquals(userFromDb, userService.authenticateUser(testUser));
+        Assert.assertEquals(userFromDb, userService.authenticateUser(this.testUser));
+
+        userService.deleteUser(createdUser.getId());
     }
 
-    @Test(expected = ResponseStatusException.class)
-    public void authenticateWrongUser(){
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
+    @Test
+    public void authenticateUserWrong(){
+        User createdUser = userService.createUser(this.testUser);
 
-        User testUser2 = new User();
-        testUser2.setUsername("testUsername2");
-        testUser2.setPassword("testPassword2");
+        Assert.assertNotEquals(this.testUser2.getUsername(),createdUser.getUsername());
+        Assert.assertNotEquals(this.testUser2.getPassword(),createdUser.getPassword());
+        Assert.assertNull(userService.authenticateUser(this.testUser2));
 
-        userService.authenticateUser(testUser2);
+        userService.deleteUser(createdUser.getId());
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test
     public void isAuthorized(){
-        User testUser = new User();
-        testUser.setUsername("testUsername");
-        testUser.setPassword("testPassword");
-        User createdUser = userService.createUser(testUser);
+        User createdUser = userService.createUser(this.testUser);
+
+        Assert.assertTrue(userService.isAuthorized(createdUser.getToken()));
+
+        userService.deleteUser(createdUser.getId());
+    }
+
+    public void isNotAuthorized(){
+        User createdUser = userService.createUser(this.testUser);
 
         String wrongToken = "Wrong-Token-I-Am";
 
         Assert.assertNotEquals(createdUser.getToken(),wrongToken);
+        Assert.assertTrue(!userService.isAuthorized(wrongToken));
 
+        userService.deleteUser(createdUser.getId());
     }
 }
