@@ -4,10 +4,10 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.exception.AuthFailedException;
 import ch.uzh.ifi.seal.soprafs19.exception.NotAuthorizedException;
 import ch.uzh.ifi.seal.soprafs19.exception.UserNotFoundException;
+import ch.uzh.ifi.seal.soprafs19.exception.UsernameAlreadyTakenException;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class UserController {
     @PostMapping("/users")
     User createUser(@RequestBody User newUser) {
         if(this.service.getUserByUsername(newUser.getUsername()) != null){
-            throw new ResponseStatusException(HttpStatus.CONFLICT,"username "+newUser.getUsername()+" already taken.");
+            throw new UsernameAlreadyTakenException(newUser.getUsername());
         }
         return this.service.createUser(newUser);
     }
