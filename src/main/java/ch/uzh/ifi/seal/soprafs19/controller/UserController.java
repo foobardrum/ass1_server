@@ -60,11 +60,12 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/users")
-    User createUser(@RequestBody User newUser) {
+    String createUser(@RequestBody User newUser) {
         if(this.service.getUserByUsername(newUser.getUsername()) != null){
             throw new UsernameAlreadyTakenException(newUser.getUsername());
         }
-        return this.service.createUser(newUser);
+        User createdUser = this.service.createUser(newUser);
+        return "{\"location\":\"/users/"+createdUser.getId()+"\"}";
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
