@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/users")
+    @PostMapping(value = "/users", produces = "application/json;charset=UTF-8")
     String createUser(@RequestBody User newUser) {
         if(this.service.getUserByUsername(newUser.getUsername()) != null){
             throw new UsernameAlreadyTakenException(newUser.getUsername());
@@ -75,9 +75,17 @@ public class UserController {
             @RequestBody User updatedUser,
             @RequestHeader(value = "Authorization",defaultValue = "") String token
     ){
-        User existingUser = this.service.getUser(id);
-        if(service.isAuthorized(token) || !existingUser.getToken().equals(token)){
-            if(this.service.updateUser(id, updatedUser) == null){
+        if(service.isAuthorized(token)){
+            User existingUser = this.service.getUser(id);
+            if(existingUser != null){
+                if(existingUser.getToken().equals(token)){
+                    if(this.service.updateUser(id, updatedUser) == null){
+                        throw new UserNotFoundException(id);
+                    }
+                }else{
+                    throw new NotAuthorizedException();
+                }
+            }else{
                 throw new UserNotFoundException(id);
             }
         }else{
